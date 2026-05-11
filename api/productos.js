@@ -24,13 +24,19 @@ export default async function handler(req, res) {
     const categories = {};
     (catData.categories || []).forEach(c => { categories[c.id] = c.name; });
     const productos = allItems
-      .map(item => ({
-        nombre: item.item_name || '',
-        precio: item.variants?.[0]?.default_price || 0,
-        cat: categories[item.category_id] || 'Sin categoria',
-        stock: Math.max(0, Math.floor(item.variants?.[0]?.stores?.[0]?.in_stock || 0)),
-        imagen: item.image_url || '',
-      }))
+      .map(item => {
+        const v = item.variants?.[0] || {};
+        const store = v.stores?.[0] || {};
+        const precio = store.price || v.default_price || v.price || 0;
+        const stock = store.in_stock != null ? Math.max(0, Math.floor(store.in_stock)) : 0;
+        return {
+          nombre: item.item_name || '',
+          precio: precio,
+          cat: categories[item.category_id] || 'Sin categoria',
+          stock: stock,
+          imagen: item.image_url || '',
+        };
+      })
       .filter(p => p.nombre && p.precio > 0)
       .sort((a, b) => a.cat.localeCompare(b.cat) || a.nombre.localeCompare(b.nombre));
     res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=60');
