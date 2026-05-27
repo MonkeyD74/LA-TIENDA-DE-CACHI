@@ -6,41 +6,56 @@ export default async function handler(req, res) {
   try {
     let allItems = [];
     let cursor = null;
+    var loops = 0;
     do {
-      const url = cursor
-        ? `https://api.loyverse.com/v1.0/items?limit=250&cursor=${cursor}`
-        : `https://api.loyverse.com/v1.0/items?limit=250`;
-      const response = await fetch(url, {
-        headers: { 'Authorization': `Bearer ${token}` }
+      loops++;
+      var url = cursor
+        ? 'https://api.loyverse.com/v1.0/items?limit=250&cursor=' + cursor
+        : 'https://api.loyverse.com/v1.0/items?limit=250';
+      var response = await fetch(url, {
+        headers: { 'Authorization': 'Bearer ' + token }
       });
-      const data = await response.json();
+      var data = await response.json();
+      if (data.errors) {
+        return res.status(500).json({ error: 'Loyverse error', details: data.errors });
+      }
       allItems = allItems.concat(data.items || []);
       cursor = data.cursor || null;
-    } while (cursor);
-    const catRes = await fetch('https://api.loyverse.com/v1.0/categories?limit=250', {
-      headers: { 'Authorization': `Bearer ${token}` }
+    } while (cursor && loops < 20);
+    var catRes = await fetch('https://api.loyverse.com/v1.0/categories?limit=250', {
+      headers: { 'Authorization': 'Bearer ' + token }
     });
-    const catData = await catRes.json();
-    const categories = {};
-    (catData.categories || []).forEach(c => { categories[c.id] = c.name; });
-    const productos = allItems
-      .map(item => {
-        const v = item.variants?.[0] || {};
-        const store = v.stores?.[0] || {};
+    var catData = await catRes.json();
+    var categories = {};
+    (catData.categories || []).forEach(function(c) { categories[c.id] = c.name; });
+    var productos = allItems
+      .map(function(item) {
+        var v = item.variants && item.variants[0] ? item.variants[0] : {};
+        var stores = v.stores || [];
+        var store = stores[0] || {};
+        var precio = store.price !== undefined && store.price !== null ? store.price : (v.default_price || 0);
+        var stock = store.in_stock !== undefined && store.in_stock !== null ? Math.max(0, Math.floor(store.in_stock)) : 0;
         return {
           nombre: item.item_name || '',
-          precio: store.price || v.default_price || 0,
+          precio: precio,
           cat: categories[item.category_id] || 'Sin categoria',
-          stock: store.in_stock != null ? Math.max(0, Math.floor(store.in_stock)) : 0,
-          imagen: item.image_url || '',
+          stock: stock,
+          imagen: item.image_url || ''
         };
       })
-      .filter(p => p.nombre && p.precio > 0)
-      .sort((a, b) => a.cat.localeCompare(b.cat) || a.nombre.localeCompare(b.nombre));
-    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=60');
+      .filter(function(p) { return p.nombre && p.precio > 0; })
+      .sort(function(a, b) { return a.cat.localeCompare(b.cat) || a.nombre.localeCompare(b.nombre); });
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.json({ productos, total: productos.length, timestamp: new Date().toISOString() });
+    res.json({
+      productos: productos,
+      total: productos.length,
+      totalRaw: allItems.length,
+      categorias: Object.keys(categories).length,
+      loops: loops,
+      timestamp: new Date().toISOString()
+    });
   } catch (error) {
-    res.status(500).json({ error: 'Error conectando con Loyverse', detail: error.message });
+    res.status(500).json({ error: error.message, stack: error.stack });
   }
 }
