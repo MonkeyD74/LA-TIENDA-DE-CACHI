@@ -74,6 +74,35 @@ body{font-family:Arial,sans-serif;background:#f0f4ff;padding-bottom:72px;}
 .menu-grid,.grid{grid-template-columns:repeat(2,1fr);}
 .logo-txt{font-size:0.95rem;}
 .contact-bar a{font-size:0.82rem;padding:11px 6px;}}
+
+/* RECOMPENSAS */
+.reward-btn{position:fixed;bottom:72px;right:16px;z-index:250;background:#FFC107;color:#0D47A1;border:none;width:56px;height:56px;border-radius:50%;font-size:1.5rem;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;transition:transform 0.2s;}
+.reward-btn:hover{transform:scale(1.1);}
+.reward-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:400;display:none;align-items:center;justify-content:center;}
+.reward-overlay.open{display:flex;}
+.reward-panel{background:white;border-radius:16px;width:90%;max-width:400px;padding:24px;box-shadow:0 8px 32px rgba(0,0,0,0.3);position:relative;max-height:90vh;overflow-y:auto;}
+.reward-close{position:absolute;top:12px;right:16px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:#888;}
+.reward-title{font-size:1.1rem;font-weight:900;color:#0D47A1;margin-bottom:16px;text-align:center;}
+.reward-input-wrap{display:flex;gap:8px;margin-bottom:16px;}
+.reward-input-wrap input{flex:1;padding:12px;border:2px solid #ddd;border-radius:10px;font-size:1rem;text-align:center;}
+.reward-input-wrap input:focus{border-color:#0D47A1;outline:none;}
+.reward-input-wrap button{padding:12px 20px;background:#0D47A1;color:white;border:none;border-radius:10px;font-weight:900;cursor:pointer;font-size:0.9rem;}
+.reward-result{text-align:center;}
+.reward-name{font-size:1.2rem;font-weight:900;color:#1a1a2e;margin-bottom:8px;}
+.reward-points{font-size:2.5rem;font-weight:900;color:#FFC107;margin:12px 0;}
+.reward-points span{font-size:0.9rem;color:#888;font-weight:400;}
+.reward-bar-wrap{background:#f0f0f0;border-radius:20px;height:24px;margin:16px 0;overflow:hidden;position:relative;}
+.reward-bar{height:100%;border-radius:20px;background:linear-gradient(90deg,#FFC107,#FF6B00);transition:width 0.5s;}
+.reward-bar-txt{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:0.7rem;font-weight:700;color:#333;}
+.reward-info{display:flex;justify-content:space-around;margin:16px 0;padding:12px;background:#f8f8f8;border-radius:10px;}
+.reward-info-item{text-align:center;}
+.reward-info-num{font-size:1.1rem;font-weight:900;color:#0D47A1;}
+.reward-info-label{font-size:0.65rem;color:#888;}
+.reward-msg{padding:12px;border-radius:10px;text-align:center;font-weight:700;margin-top:12px;}
+.reward-msg.prize{background:#e8f5e9;color:#2E7D32;}
+.reward-msg.nope{background:#f5f5f5;color:#888;}
+.reward-msg.error{background:#ffebee;color:#B71C1C;}
+.reward-loading{text-align:center;padding:20px;color:#888;}
 </style>
 </head>
 <body>
@@ -96,6 +125,26 @@ body{font-family:Arial,sans-serif;background:#f0f4ff;padding-bottom:72px;}
 <div id="busqueda-wrap" class="hidden"><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><button class="btn-back" onclick="volverMenu()">&#9664; Volver</button><span id="busqueda-titulo" style="font-size:0.9rem;font-weight:700;color:#0D47A1;"></span></div><div class="grid" id="busqueda-grid"></div><div class="no-res hidden" id="no-res-busq">No se encontraron productos</div></div>
 </div></div>
 <div id="timestamp" class="timestamp hidden"></div>
+
+<!-- BOTON RECOMPENSAS -->
+<button class="reward-btn" onclick="openRewards()">&#11088;</button>
+
+<!-- PANEL RECOMPENSAS -->
+<div class="reward-overlay" id="rewardOverlay" onclick="if(event.target===this)closeRewards()">
+  <div class="reward-panel">
+    <button class="reward-close" onclick="closeRewards()">&#10005;</button>
+    <div class="reward-title">&#11088; Mis Recompensas</div>
+    <div id="rewardSearch">
+      <p style="text-align:center;font-size:0.82rem;color:#666;margin-bottom:12px;">Ingresa tu numero de telefono para ver tus puntos</p>
+      <div class="reward-input-wrap">
+        <input type="tel" id="rewardPhone" placeholder="Tu telefono" maxlength="15">
+        <button onclick="buscarRecompensas()">Buscar</button>
+      </div>
+    </div>
+    <div id="rewardLoading" class="reward-loading" style="display:none">Buscando tus puntos...</div>
+    <div id="rewardResult" class="reward-result" style="display:none"></div>
+  </div>
+</div>
 <div class="contact-bar">
 <a class="cwa" href="https://wa.me/523481239175?text=Hola+La+Tienda+de+Cachi"><svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>WhatsApp</a>
 <a class="ctel" href="tel:+523481239175"><svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>Llamar</a>
@@ -121,6 +170,11 @@ function filtrarCat(){if(!catActiva)return;var s=document.getElementById("soloDi
 function buscarGlobal(){var q=document.getElementById("buscar").value.toLowerCase().trim();if(!q){volverMenu();return;}document.getElementById("menu-principal").classList.add("hidden");document.getElementById("cat-content").classList.add("hidden");var res=allProducts.filter(function(p){return p.nombre.toLowerCase().indexOf(q)>=0;});document.getElementById("busqueda-grid").innerHTML=res.map(cardHTML).join("");document.getElementById("busqueda-titulo").textContent=res.length+" resultados";document.getElementById("no-res-busq").classList.toggle("hidden",res.length>0);document.getElementById("busqueda-wrap").classList.remove("hidden");document.querySelectorAll(".sidebar-item").forEach(function(i){i.classList.remove("active");});}
 var perrito=document.getElementById("perritoGif");var section=document.getElementById("avatarSection");var bubble=document.getElementById("avatarBubble");var px=0,dir=1,gifIdx=0,lastBark=-1;var frases=["Guau!","Woof!","Hola!","Arf!"];perrito.src=GIF_FRAMES[0];function walk(){var mx=section.offsetWidth-170;px+=dir*3.5;if(px>=mx){px=mx;dir=-1;perrito.style.transform="scaleX(-1)";}if(px<=0){px=0;dir=1;perrito.style.transform="scaleX(1)";}perrito.style.left=px+"px";gifIdx=(gifIdx+1)%GIF_FRAMES.length;perrito.src=GIF_FRAMES[gifIdx];}setInterval(walk,1000);function perritoClick(){barkRandom();var bx=Math.min(px+10,section.offsetWidth-190);bubble.style.left=Math.max(0,bx)+"px";bubble.textContent=frases[Math.floor(Math.random()*frases.length)];bubble.style.opacity="1";setTimeout(function(){bubble.style.opacity="0";},2000);}function barkRandom(){var i;do{i=Math.floor(Math.random()*BARKS.length);}while(i===lastBark);lastBark=i;try{var au=new Audio(BARKS[i]);au.volume=0.5;au.play();}catch(e){}}
 (function(){var canvas=document.getElementById("fw-canvas");var ctx=canvas.getContext("2d");function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}resize();window.addEventListener("resize",resize);var COLORS=["#FF6B00","#FFC107","#FF3366","#00E5FF","#B2FF59","#EA80FC","#FFD740","#fff","#FF6E40","#69F0AE"];var sparks=[];function spiralBurst(cx,cy){var c1=COLORS[Math.floor(Math.random()*COLORS.length)],c2=COLORS[Math.floor(Math.random()*COLORS.length)];var arms=3+Math.floor(Math.random()*3),total=120+Math.floor(Math.random()*60),d=Math.random()<0.5?1:-1;for(var i=0;i<total;i++){var t=i/total,arm=i%arms,angle=(arm/arms)*Math.PI*2+d*t*Math.PI*4,speed=1.5+t*5.5;sparks.push({x:cx,y:cy,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,color:t<0.3?c2:c1,alpha:1,size:0.5+Math.random(),gravity:0.05+Math.random()*0.03,decay:0.006+Math.random()*0.007,trail:[],bounced:false});}for(var k=0;k<20;k++){var a=(k/20)*Math.PI*2;sparks.push({x:cx,y:cy,vx:Math.cos(a)*1.5,vy:Math.sin(a)*1.5,color:"#ffffcc",alpha:1,size:1.1,gravity:0.015,decay:0.025,trail:[],bounced:false});}}var launches=0;var maxL=18;function launchNext(){if(launches>=maxL)return;spiralBurst(canvas.width*0.08+Math.random()*canvas.width*0.84,canvas.height*(0.05+Math.random()*0.28));launches++;if(launches<maxL)setTimeout(launchNext,180+Math.random()*280);}launchNext();var gs=[];function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);var fy=canvas.height*0.92;for(var i=sparks.length-1;i>=0;i--){var s=sparks[i];s.trail.push({x:s.x,y:s.y});if(s.trail.length>10)s.trail.shift();s.x+=s.vx;s.y+=s.vy;s.vy+=s.gravity;s.vx*=0.987;s.alpha-=s.decay;if(s.alpha<=0){sparks.splice(i,1);continue;}if(!s.bounced&&s.y>=fy){s.bounced=true;s.vy=-Math.abs(s.vy)*0.25;s.vx*=0.3;s.alpha*=0.4;gs.push({x:s.x,y:fy,vx:(Math.random()-0.5)*2.5,vy:-Math.random()*1.2,alpha:s.alpha,color:s.color,size:0.5,decay:0.06});}if(s.trail.length>1){ctx.beginPath();ctx.moveTo(s.trail[0].x,s.trail[0].y);for(var t=1;t<s.trail.length;t++)ctx.lineTo(s.trail[t].x,s.trail[t].y);ctx.strokeStyle=s.color;ctx.globalAlpha=s.alpha*0.45;ctx.lineWidth=s.size*0.5;ctx.stroke();}ctx.globalAlpha=s.alpha;ctx.fillStyle=s.color;ctx.beginPath();ctx.arc(s.x,s.y,s.size,0,Math.PI*2);ctx.fill();}for(var i=gs.length-1;i>=0;i--){var g=gs[i];g.x+=g.vx;g.y+=g.vy;g.vy+=0.05;g.alpha-=g.decay;if(g.alpha<=0){gs.splice(i,1);continue;}ctx.globalAlpha=g.alpha;ctx.fillStyle=g.color;ctx.beginPath();ctx.arc(g.x,g.y,g.size,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;if(sparks.length>0||gs.length>0||launches<maxL)requestAnimationFrame(loop);else ctx.clearRect(0,0,canvas.width,canvas.height);}loop();})();
+
+function openRewards(){document.getElementById("rewardOverlay").classList.add("open");document.getElementById("rewardPhone").value="";document.getElementById("rewardResult").style.display="none";document.getElementById("rewardSearch").style.display="block";document.getElementById("rewardLoading").style.display="none";}
+function closeRewards(){document.getElementById("rewardOverlay").classList.remove("open");}
+async function buscarRecompensas(){var phone=document.getElementById("rewardPhone").value.trim();if(phone.length<7){alert("Ingresa un numero valido");return;}document.getElementById("rewardSearch").style.display="none";document.getElementById("rewardLoading").style.display="block";document.getElementById("rewardResult").style.display="none";try{var res=await fetch("/api/recompensas?phone="+encodeURIComponent(phone));var data=await res.json();document.getElementById("rewardLoading").style.display="none";document.getElementById("rewardResult").style.display="block";if(!data.encontrado){document.getElementById("rewardResult").innerHTML="<div class='reward-msg error'>"+data.mensaje+"</div><button onclick='document.getElementById("rewardSearch").style.display="block";document.getElementById("rewardResult").style.display="none"' style='margin-top:12px;padding:8px 20px;background:#0D47A1;color:white;border:none;border-radius:8px;cursor:pointer'>Intentar otro numero</button>";return;}var premio=data.tienePremio?"<div class='reward-msg prize'>&#127881; Tienes un premio de $"+data.valorPremio+" disponible! Pidelo en la tienda</div>":"<div class='reward-msg nope'>Te faltan "+data.falta+" puntos para tu premio de $"+data.valorPremio+"</div>";document.getElementById("rewardResult").innerHTML="<div class='reward-name'>Hola, "+data.nombre+"!</div><div class='reward-points'>"+data.puntos+" <span>puntos</span></div><div class='reward-bar-wrap'><div class='reward-bar' style='width:"+data.progreso+"%'></div><div class='reward-bar-txt'>"+data.progreso+"% para tu premio</div></div><div class='reward-info'><div class='reward-info-item'><div class='reward-info-num'>"+data.visitas+"</div><div class='reward-info-label'>Visitas</div></div><div class='reward-info-item'><div class='reward-info-num'>$"+data.gastado.toFixed(0)+"</div><div class='reward-info-label'>Total compras</div></div></div>"+premio+"<button onclick='document.getElementById("rewardSearch").style.display="block";document.getElementById("rewardResult").style.display="none"' style='margin-top:12px;padding:8px 20px;background:#0D47A1;color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem'>Buscar otro numero</button>";}catch(e){document.getElementById("rewardLoading").style.display="none";document.getElementById("rewardResult").style.display="block";document.getElementById("rewardResult").innerHTML="<div class='reward-msg error'>Error al buscar. Intenta de nuevo.</div>";}}
+
 cargarProductos();
 </script>
 </body>
