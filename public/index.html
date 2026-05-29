@@ -174,7 +174,7 @@ cargarProductos();
   <button onclick="window.scrollTo({top:0,behavior:'smooth'})">🏠 Inicio</button>
   <button onclick="document.querySelector('.sidebar')?.scrollIntoView({behavior:'smooth'})">📂 Categorías</button>
   <button onclick="document.querySelector('input')?.focus()">🔍 Buscar</button>
-  <button onclick="document.getElementById('rewardOverlay')?.style.display='block'">🎁 Recompensas</button>
+  <button onclick="openReward()">🎁 Recompensas</button>
 </nav>
 
 <button class="btn-regresar" onclick="document.querySelector('.sidebar')?.scrollIntoView({behavior:'smooth'})">
@@ -199,6 +199,13 @@ async function consultarReward(){
   const d=await r.json();
   if(!d.encontrado){box.textContent=d.mensaje||'No encontrado';return;}
   box.innerHTML='👤 '+d.nombre+'<br>💵 Gastado: $'+Number(d.gastado||0).toFixed(2)+'<br>🎁 Crédito: $'+Number(d.credito||0).toFixed(2);
+}
+</script>
+
+<script>
+function openReward(){
+  var el=document.getElementById('rewardOverlay');
+  if(el) el.style.display='block';
 }
 </script>
 </body>
