@@ -34,7 +34,7 @@ export default async function handler(req, res) {
 
     const puntos = Number(found.total_points || 0);
     const gastado = Number(found.total_money_spent || 0);
-    const credito = +(puntos * 0.01).toFixed(2);
+    const credito = puntos;
 
     return res.json({
       encontrado: true,
