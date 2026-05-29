@@ -20,7 +20,8 @@ export default async function handler(req, res) {
       var cPhone = (c.phone_number || '').replace(/[^0-9]/g, '');
       if (cPhone.slice(-10) === phoneLast) { found = c; break; }
     }
-    if (!found) { return res.json({ encontrado: false, mensaje: 'No encontramos tu numero. Pregunta en la tienda para registrarte.' }); }
+    if (!found) { return res.json({ encontrado: false, mensaje: 'No encontramos tu numero. Pregunta en la tienda para registrarte.'
+  }); }); }
     var puntos = found.total_points || 0;
     var puntosParaPremio = 100;
     var valorPremio = 50;
