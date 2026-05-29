@@ -9,7 +9,17 @@ export default async function handler(req, res) {
       loops++;
       var url = cursor ? 'https://api.loyverse.com/v1.0/customers?limit=250&cursor=' + cursor : 'https://api.loyverse.com/v1.0/customers?limit=250';
       var response = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token } });
-      var data = await response.json();
+
+if (!response.ok) {
+  var errorText = await response.text();
+  return res.status(response.status).json({
+    error: 'Error consultando Loyverse',
+    detalle: errorText
+  });
+}
+
+var data = await response.json();
+
       allCustomers = allCustomers.concat(data.customers || []);
       cursor = data.cursor || null;
     } while (cursor && loops < 10);
