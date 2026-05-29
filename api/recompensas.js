@@ -31,7 +31,6 @@ var data = await response.json();
       if (cPhone.slice(-10) === phoneLast) { found = c; break; }
     }
     if (!found) { return res.json({ encontrado: false, mensaje: 'No encontramos tu numero. Pregunta en la tienda para registrarte.'
-  }); }); }
     var puntos = found.total_points || 0;
     var puntosParaPremio = 100;
     var valorPremio = 50;
