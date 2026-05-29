@@ -1,48 +1,49 @@
 export default async function handler(req, res) {
-  var token = process.env.LOYVERSE_TOKEN;
-  if (!token) { return res.status(500).json({ error: 'Token no configurado' }); }
-  var phone = (req.query.phone || '').replace(/[^0-9]/g, '');
-  if (phone.length < 7) { return res.status(400).json({ error: 'Numero invalido' }); }
   try {
-    var allCustomers = [], cursor = null, loops = 0;
-    do {
-      loops++;
-      var url = cursor ? 'https://api.loyverse.com/v1.0/customers?limit=250&cursor=' + cursor : 'https://api.loyverse.com/v1.0/customers?limit=250';
-      var response = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token } });
+    const token = process.env.LOYVERSE_TOKEN;
+    if (!token) return res.status(500).json({ error: 'Token no configurado' });
 
-if (!found) {
-  return res.json({
-    encontrado: false,
-    mensaje: 'No encontramos tu numero. Pregunta en la tienda para registrarte.'
-  });
-}
-    
-var puntos = found.total_points || 0;
-  var errorText = await response.text();
-  return res.status(response.status).json({
-    error: 'Error consultando Loyverse',
-    detalle: errorText
-  });
-}
+    const phone = String(req.query.phone || '').replace(/[^0-9]/g, '');
+    if (phone.length < 7) return res.status(400).json({ error: 'Numero invalido' });
 
-var data = await response.json();
+    const response = await fetch('https://api.loyverse.com/v1.0/customers?limit=250', {
+      headers: { Authorization: 'Bearer ' + token }
+    });
 
-      allCustomers = allCustomers.concat(data.customers || []);
-      cursor = data.cursor || null;
-    } while (cursor && loops < 10);
-    var phoneLast = phone.slice(-10);
-    var found = null;
-    for (var i = 0; i < allCustomers.length; i++) {
-      var c = allCustomers[i];
-      var cPhone = (c.phone_number || '').replace(/[^0-9]/g, '');
-      if (cPhone.slice(-10) === phoneLast) { found = c; break; }
+    if (!response.ok) {
+      return res.status(response.status).json({
+        error: 'Error consultando Loyverse',
+        detalle: await response.text()
+      });
     }
-    if (!found) { return res.json({ encontrado: false, 
-    var puntos = found.total_points || 0;
-    var puntosParaPremio = 100;
-    var valorPremio = 50;
-    res.setHeader('Cache-Control', 'no-cache, no-store');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.json({ encontrado: true, nombre: found.name || 'Cliente', puntos: puntos, visitas: found.total_visits || 0, gastado: found.total_money_spent || 0, progreso: Math.min(100, Math.round((puntos / puntosParaPremio) * 100)), falta: Math.max(0, puntosParaPremio - puntos), puntosParaPremio: puntosParaPremio, valorPremio: valorPremio, tienePremio: puntos >= puntosParaPremio });
-  } catch (error) { res.status(500).json({ error: error.message }); }
+
+    const data = await response.json();
+    const phoneLast = phone.slice(-10);
+
+    const found = (data.customers || []).find(c => {
+      const cPhone = String(c.phone_number || '').replace(/[^0-9]/g, '');
+      return cPhone.slice(-10) === phoneLast;
+    });
+
+    if (!found) {
+      return res.json({
+        encontrado: false,
+        mensaje: 'No encontramos tu numero. Pregunta en la tienda para registrarte.'
+      });
+    }
+
+    const gastado = Number(found.total_money_spent || 0);
+    const credito = +(gastado * 0.01).toFixed(2);
+
+    return res.json({
+      encontrado: true,
+      nombre: found.name || 'Cliente',
+      telefono: found.phone_number || '',
+      gastado,
+      credito,
+      mensaje: 'Credito acumulado calculado al 1%'
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
 }
