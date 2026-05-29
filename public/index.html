@@ -167,33 +167,5 @@ cargarProductos();
 
 <button class="btn-regresar" onclick="document.querySelector('.sidebar')?.scrollIntoView({behavior:'smooth'})">
   ← Categorías
-</button><section id="recompensasBox" style="padding:16px;background:#fff3cd;margin:14px;border-radius:14px">
-  <h2>🎁 Recompensas</h2>
-  <p>Acumula 1 centavo por cada $1 peso comprado.</p>
-  <input id="telefonoReward" placeholder="Tu número de teléfono" style="padding:12px;width:100%;margin:8px 0">
-  <button onclick="consultarRecompensa()" style="padding:12px;width:100%;background:#0D47A1;color:white;border:0;border-radius:10px;font-weight:bold">
-    Revisar mi crédito
-  </button>
-  <div id="resultadoReward" style="margin-top:12px;font-weight:bold"></div>
-</section>
-
-<script>
-async function consultarRecompensa(){
-  const phone=document.getElementById('telefonoReward').value.trim();
-  const box=document.getElementById('resultadoReward');
-  box.textContent='Consultando...';
-  const res=await fetch('/api/recompensas?phone='+encodeURIComponent(phone));
-  const data=await res.json();
-
-  if(!data.encontrado){
-    box.innerHTML='❌ '+(data.mensaje||'No encontrado');
-    return;
-  }
-
-  box.innerHTML=
-    '👤 '+data.nombre+'<br>'+
-    '💵 Gastado: $'+Number(data.gastado||0).toFixed(2)+'<br>'+
-    '🎁 Crédito disponible: $'+Number(data.credito||0).toFixed(2);
-}
-</script></body>
+</button></body>
 </html>
