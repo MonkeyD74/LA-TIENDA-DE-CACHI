@@ -74,6 +74,41 @@ body{font-family:Arial,sans-serif;background:#f0f4ff;padding-bottom:72px;}
 .menu-grid,.grid{grid-template-columns:repeat(2,1fr);}
 .logo-txt{font-size:0.95rem;}
 .contact-bar a{font-size:0.82rem;padding:11px 6px;}}
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  z-index:9998;
+  background:white;
+  display:flex;
+  justify-content:space-around;
+  padding:8px 4px;
+  box-shadow:0 -3px 12px rgba(0,0,0,.18);
+}
+.bottom-nav button{
+  border:0;
+  background:transparent;
+  font-size:.72rem;
+  font-weight:800;
+  color:#0D47A1;
+}
+.btn-regresar{
+  position:fixed;
+  left:12px;
+  bottom:58px;
+  z-index:9999;
+  background:#0D47A1;
+  color:white;
+  border:0;
+  border-radius:999px;
+  padding:10px 14px;
+  font-weight:900;
+  box-shadow:0 4px 14px rgba(0,0,0,.25);
+}
+body{
+  padding-bottom:70px;
+}
 </style>
 </head>
 <body>
@@ -123,5 +158,14 @@ var perrito=document.getElementById("perritoGif");var section=document.getElemen
 (function(){var canvas=document.getElementById("fw-canvas");var ctx=canvas.getContext("2d");function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}resize();window.addEventListener("resize",resize);var COLORS=["#FF6B00","#FFC107","#FF3366","#00E5FF","#B2FF59","#EA80FC","#FFD740","#fff","#FF6E40","#69F0AE"];var sparks=[];function spiralBurst(cx,cy){var c1=COLORS[Math.floor(Math.random()*COLORS.length)],c2=COLORS[Math.floor(Math.random()*COLORS.length)];var arms=3+Math.floor(Math.random()*3),total=120+Math.floor(Math.random()*60),d=Math.random()<0.5?1:-1;for(var i=0;i<total;i++){var t=i/total,arm=i%arms,angle=(arm/arms)*Math.PI*2+d*t*Math.PI*4,speed=1.5+t*5.5;sparks.push({x:cx,y:cy,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,color:t<0.3?c2:c1,alpha:1,size:0.5+Math.random(),gravity:0.05+Math.random()*0.03,decay:0.006+Math.random()*0.007,trail:[],bounced:false});}for(var k=0;k<20;k++){var a=(k/20)*Math.PI*2;sparks.push({x:cx,y:cy,vx:Math.cos(a)*1.5,vy:Math.sin(a)*1.5,color:"#ffffcc",alpha:1,size:1.1,gravity:0.015,decay:0.025,trail:[],bounced:false});}}var launches=0;var maxL=18;function launchNext(){if(launches>=maxL)return;spiralBurst(canvas.width*0.08+Math.random()*canvas.width*0.84,canvas.height*(0.05+Math.random()*0.28));launches++;if(launches<maxL)setTimeout(launchNext,180+Math.random()*280);}launchNext();var gs=[];function loop(){ctx.clearRect(0,0,canvas.width,canvas.height);var fy=canvas.height*0.92;for(var i=sparks.length-1;i>=0;i--){var s=sparks[i];s.trail.push({x:s.x,y:s.y});if(s.trail.length>10)s.trail.shift();s.x+=s.vx;s.y+=s.vy;s.vy+=s.gravity;s.vx*=0.987;s.alpha-=s.decay;if(s.alpha<=0){sparks.splice(i,1);continue;}if(!s.bounced&&s.y>=fy){s.bounced=true;s.vy=-Math.abs(s.vy)*0.25;s.vx*=0.3;s.alpha*=0.4;gs.push({x:s.x,y:fy,vx:(Math.random()-0.5)*2.5,vy:-Math.random()*1.2,alpha:s.alpha,color:s.color,size:0.5,decay:0.06});}if(s.trail.length>1){ctx.beginPath();ctx.moveTo(s.trail[0].x,s.trail[0].y);for(var t=1;t<s.trail.length;t++)ctx.lineTo(s.trail[t].x,s.trail[t].y);ctx.strokeStyle=s.color;ctx.globalAlpha=s.alpha*0.45;ctx.lineWidth=s.size*0.5;ctx.stroke();}ctx.globalAlpha=s.alpha;ctx.fillStyle=s.color;ctx.beginPath();ctx.arc(s.x,s.y,s.size,0,Math.PI*2);ctx.fill();}for(var i=gs.length-1;i>=0;i--){var g=gs[i];g.x+=g.vx;g.y+=g.vy;g.vy+=0.05;g.alpha-=g.decay;if(g.alpha<=0){gs.splice(i,1);continue;}ctx.globalAlpha=g.alpha;ctx.fillStyle=g.color;ctx.beginPath();ctx.arc(g.x,g.y,g.size,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;if(sparks.length>0||gs.length>0||launches<maxL)requestAnimationFrame(loop);else ctx.clearRect(0,0,canvas.width,canvas.height);}loop();})();
 cargarProductos();
 </script>
-</body>
+<nav class="bottom-nav">
+  <button onclick="window.scrollTo({top:0,behavior:'smooth'})">🏠 Inicio</button>
+  <button onclick="document.querySelector('.sidebar')?.scrollIntoView({behavior:'smooth'})">📂 Categorías</button>
+  <button onclick="document.querySelector('input')?.focus()">🔍 Buscar</button>
+  <button onclick="document.getElementById('rewardOverlay')?.classList.add('open')">🎁 Recompensas</button>
+</nav>
+
+<button class="btn-regresar" onclick="document.querySelector('.sidebar')?.scrollIntoView({behavior:'smooth'})">
+  ← Categorías
+</button></body>
 </html>
