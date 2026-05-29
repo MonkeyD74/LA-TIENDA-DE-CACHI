@@ -10,9 +10,14 @@ export default async function handler(req, res) {
       var url = cursor ? 'https://api.loyverse.com/v1.0/customers?limit=250&cursor=' + cursor : 'https://api.loyverse.com/v1.0/customers?limit=250';
       var response = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token } });
 
-if (!response.ok) {mensaje: 'No encontramos tu numero. Pregunta en la tienda para registrarte.'
+if (!found) {
+  return res.json({
+    encontrado: false,
+    mensaje: 'No encontramos tu numero. Pregunta en la tienda para registrarte.'
   });
 }
+    
+var puntos = found.total_points || 0;
   var errorText = await response.text();
   return res.status(response.status).json({
     error: 'Error consultando Loyverse',
