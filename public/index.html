@@ -174,10 +174,32 @@ cargarProductos();
   <button onclick="window.scrollTo({top:0,behavior:'smooth'})">🏠 Inicio</button>
   <button onclick="document.querySelector('.sidebar')?.scrollIntoView({behavior:'smooth'})">📂 Categorías</button>
   <button onclick="document.querySelector('input')?.focus()">🔍 Buscar</button>
-  <button onclick="document.getElementById('rewardOverlay')?.classList.add('open')">🎁 Recompensas</button>
+  <button onclick="document.getElementById('rewardOverlay')?.style.display='block'">🎁 Recompensas</button>
 </nav>
 
 <button class="btn-regresar" onclick="document.querySelector('.sidebar')?.scrollIntoView({behavior:'smooth'})">
   ← Categorías
-</button></body>
+</button>
+<div id="rewardOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:99999;padding:18px">
+  <div style="background:white;border-radius:16px;padding:18px;max-width:420px;margin:60px auto">
+    <button onclick="document.getElementById('rewardOverlay').style.display='none'" style="float:right">✖</button>
+    <h2>🎁 Recompensas</h2>
+    <p>Acumula 1 centavo por cada $1 peso comprado.</p>
+    <input id="rewardPhone" placeholder="Tu número" style="width:100%;padding:12px;margin:10px 0">
+    <button onclick="consultarReward()" style="width:100%;padding:12px;background:#0D47A1;color:white;border:0;border-radius:10px">Consultar crédito</button>
+    <div id="rewardResult" style="margin-top:12px;font-weight:900"></div>
+  </div>
+</div>
+<script>
+async function consultarReward(){
+  const phone=document.getElementById('rewardPhone').value.trim();
+  const box=document.getElementById('rewardResult');
+  box.textContent='Consultando...';
+  const r=await fetch('/api/recompensas?phone='+encodeURIComponent(phone));
+  const d=await r.json();
+  if(!d.encontrado){box.textContent=d.mensaje||'No encontrado';return;}
+  box.innerHTML='👤 '+d.nombre+'<br>💵 Gastado: $'+Number(d.gastado||0).toFixed(2)+'<br>🎁 Crédito: $'+Number(d.credito||0).toFixed(2);
+}
+</script>
+</body>
 </html>
