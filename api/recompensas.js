@@ -32,16 +32,18 @@ export default async function handler(req, res) {
       });
     }
 
+    const puntos = Number(found.total_points || 0);
     const gastado = Number(found.total_money_spent || 0);
-    const credito = +(gastado * 0.01).toFixed(2);
+    const credito = +(puntos * 0.01).toFixed(2);
 
     return res.json({
       encontrado: true,
       nombre: found.name || 'Cliente',
       telefono: found.phone_number || '',
+      puntos,
       gastado,
       credito,
-      mensaje: 'Credito acumulado calculado al 1%'
+      mensaje: 'Credito acumulado calculado desde puntos'
     });
   } catch (error) {
     return res.status(500).json({ error: error.message });
