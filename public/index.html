@@ -289,7 +289,7 @@ async function consultarReward(){
   const r=await fetch('/api/recompensas?phone='+encodeURIComponent(phone));
   const d=await r.json();
   if(!d.encontrado){box.textContent=d.mensaje||'No encontrado';return;}
-  box.innerHTML='👤 '+d.nombre+'<br>💵 Gastado: $'+Number(d.gastado||0).toFixed(2)+'<br>🎁 Crédito: $'+Number(d.credito||0).toFixed(2);
+  box.innerHTML='🎁 Crédito disponible: $'+Number(d.credito||0).toFixed(2);
 }
 </script>
 
