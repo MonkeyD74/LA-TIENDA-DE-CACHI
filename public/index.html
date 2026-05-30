@@ -109,6 +109,30 @@ body{font-family:Arial,sans-serif;background:#f0f4ff;padding-bottom:72px;}
 body{
   padding-bottom:70px;
 }
+
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  z-index:9999;
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+  background:#111827;
+  padding:10px;
+}
+.bottom-nav button{
+  border:0;
+  border-radius:14px;
+  padding:13px 8px;
+  font-weight:900;
+  font-size:.85rem;
+  color:white;
+}
+.nav-whatsapp{background:#16A34A!important;}
+.nav-call{background:#0D47A1!important;}
+.nav-reward{background:#E65100!important;}
 </style>
 </head>
 <body>
@@ -171,17 +195,12 @@ var perrito=document.getElementById("perritoGif");var section=document.getElemen
 cargarProductos();
 </script>
 <nav class="bottom-nav">
-  <button onclick="window.scrollTo({top:0,behavior:'smooth'})"
-  <button onclick="document.querySelector('.sidebar')?.scrollIntoView({behavior:'smooth'})"
-  <button onclick="document.querySelector('input')?.focus()<button onclick="window.location.href='https://wa.me/523481043572'">
-📱 WhatsApp
-</button>
-  <button onclick="openReward()">🎁 Recompensas</button>
+  <button class="nav-whatsapp" onclick="window.location.href='https://wa.me/523481043572'">📱 WhatsApp</button>
+  <button class="nav-call" onclick="window.location.href='tel:+523481043572'">📞 Llamar</button>
+  <button class="nav-reward" onclick="openReward()">🎁 Recompensas</button>
 </nav>
 
-<button class="btn-regresar" onclick="document.querySelector('.sidebar')?.scrollIntoView({behavior:'smooth'})">
-  ← Categorías
-</button>
+
 <div id="rewardOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:99999;padding:18px">
   <div style="background:white;border-radius:16px;padding:18px;max-width:420px;margin:60px auto">
     <button onclick="document.getElementById('rewardOverlay').style.display='none'" style="float:right">✖</button>
