@@ -133,6 +133,22 @@ body{
 .nav-whatsapp{background:#16A34A!important;}
 .nav-call{background:#0D47A1!important;}
 .nav-reward{background:#E65100!important;}
+
+#btnMenuCategoriasFlotante{
+  position:fixed;
+  left:14px;
+  bottom:86px;
+  z-index:99999;
+  background:#0D47A1;
+  color:white;
+  border:0;
+  border-radius:999px;
+  padding:13px 18px;
+  font-weight:900;
+  font-size:15px;
+  box-shadow:0 4px 14px rgba(0,0,0,.35);
+}
+
 </style>
 </head>
 <body>
@@ -229,5 +245,8 @@ function openReward(){
   if(el) el.style.display='block';
 }
 </script>
+
+<button id="btnMenuCategoriasFlotante" onclick="volverMenu()">☰ Categorías</button>
+
 </body>
 </html>
