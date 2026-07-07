@@ -45,7 +45,7 @@ export default async function handler(req, res) {
       })
       .filter(function(p) { return p.nombre && p.precio > 0; })
       .sort(function(a, b) { return a.cat.localeCompare(b.cat) || a.nombre.localeCompare(b.nombre); });
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=600');
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.json({
       productos: productos,

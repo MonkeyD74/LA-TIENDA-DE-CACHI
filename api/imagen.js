@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 
     const buffer = Buffer.from(await r.arrayBuffer());
     res.setHeader('Content-Type', r.headers.get('content-type') || 'image/jpeg');
-    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=2592000, stale-while-revalidate=86400');
     return res.send(buffer);
   } catch (e) {
     return res.status(500).send(e.message);
