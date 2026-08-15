@@ -299,7 +299,7 @@ async function consultarReward(){
   const phone=document.getElementById('rewardPhone').value.trim();
   const box=document.getElementById('rewardResult');
   box.textContent='Consultando...';
-  const r=await fetch('/api/recompensas?phone='+encodeURIComponent(phone));
+  const r=await fetch('/api/recompensas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone})});
   const d=await r.json();
   if(!d.encontrado){box.textContent=d.mensaje||'No encontrado';return;}
   box.innerHTML='🎁 Crédito disponible: $'+Number(d.credito||0).toFixed(2);

@@ -1,0 +1,12 @@
+{
+  "name": "la-tienda-de-cachi",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.38.2"
+  }
+}
