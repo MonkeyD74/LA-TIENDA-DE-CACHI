@@ -209,6 +209,15 @@ box-shadow:0 4px 15px rgba(0,0,0,.35);
 .cart-clear{background:#CC1A1A;color:white;}
 
 .nav-cart{background:#7C3AED!important;color:white!important;}
+
+/* Lightbox */
+.lightbox-overlay{display:none;position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.85);justify-content:center;align-items:center;padding:20px;}
+.lightbox-overlay.open{display:flex;}
+.lightbox-wrap{position:relative;max-width:95vw;max-height:95vh;text-align:center;}
+.lightbox-img{max-width:100%;max-height:80vh;border-radius:10px;display:block;margin:0 auto;box-shadow:0 4px 30px rgba(0,0,0,.4);}
+.lightbox-name{color:white;font-size:1rem;font-weight:700;margin-top:10px;text-shadow:0 1px 4px rgba(0,0,0,.5);}
+#lightboxCloseBtn{position:fixed;top:12px;right:16px;background:rgba(0,0,0,.45);color:white;border:none;font-size:26px;width:44px;height:44px;border-radius:50%;cursor:pointer;z-index:1000000;line-height:44px;text-align:center;transition:background .15s;}
+#lightboxCloseBtn:hover{background:rgba(0,0,0,.75);}
 </style>
 </head>
 <body>
@@ -421,6 +430,54 @@ document.addEventListener('DOMContentLoaded',function(){
 var b=document.getElementById('btnMenuCategoriasFlotante');
 if(b){b.onclick=goCategorias;}
 });
+</script>
+
+<!-- Lightbox -->
+<div id="lightbox" class="lightbox-overlay">
+  <div class="lightbox-wrap">
+    <button id="lightboxCloseBtn">&times;</button>
+    <img class="lightbox-img" id="lightboxImg" src="" alt="">
+    <div class="lightbox-name" id="lightboxName"></div>
+  </div>
+</div>
+<script>
+(function(){
+  var lb = document.getElementById('lightbox');
+  var lbImg = document.getElementById('lightboxImg');
+  var lbName = document.getElementById('lightboxName');
+  var lbCloseBtn = document.getElementById('lightboxCloseBtn');
+
+  function openLB(img, name) {
+    lbImg.src = img.src;
+    lbName.textContent = name;
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLB() {
+    lb.classList.remove('open');
+    lbImg.src = '';
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.btn-add-cart')) return;
+    var card = e.target.closest('.card');
+    if (!card) return;
+    var img = card.querySelector('.card-img > img');
+    if (!img || img.style.display === 'none') return;
+    var ne = card.querySelector('.card-name');
+    openLB(img, ne ? ne.textContent : '');
+  });
+
+  lbCloseBtn.addEventListener('click', closeLB);
+  lb.addEventListener('click', function(e) {
+    if (e.target === lb) closeLB();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && lb.classList.contains('open')) closeLB();
+  });
+})();
 </script>
 </body>
 
