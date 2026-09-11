@@ -28,7 +28,27 @@ export default async function handler(req, res) {
     var catData = await catRes.json();
     var categories = {};
     (catData.categories || []).forEach(function(c) { categories[c.id] = c.name; });
-    var productos = allItems
+
+    var productos = allItems// Stock real: vive en /inventory, no en /items
+    var stockMap = {};
+    var invCursor = null;
+    var invLoops = 0;
+    do {
+      invLoops++;
+      var invUrl = 'https://api.loyverse.com/v1.0/inventory?limit=250' +
+        (invCursor ? '&cursor=' + encodeURIComponent(invCursor) : '');
+      var invRes = await fetch(invUrl, {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      var invData = await invRes.json();
+      if (invData.errors) {
+        return res.status(500).json({ error: 'Loyverse inventory error', details: invData.errors });
+      }
+      (invData.inventory_levels || []).forEach(function(l) {
+        stockMap[l.variant_id + '|' + l.store_id] = l.in_stock;
+      });
+      invCursor = invData.cursor || null;
+    } while (invCursor && invLoops < 50);
       .map(function(item) {
         var v = item.variants && item.variants[0] ? item.variants[0] : {};
         var stores = v.stores || [];
