@@ -49,7 +49,9 @@ export default async function handler(req, res) {
         stockMap[l.variant_id + '|' + l.store_id] = l.in_stock;
       });
       invCursor = invData.cursor || null;
-    } while (invCursor && invLoops < 50);
+    } while (invCursor && invLoops < 50);-        var stock = store.in_stock !== undefined && store.in_stock !== null ? Math.max(0, Math.floor(store.in_stock)) : 0;
++        var raw = stockMap[v.variant_id + '|' + store.store_id];
++        var stock = raw != null ? Math.max(0, Math.floor(raw)) : 0;
       .map(function(item) {
         var v = item.variants && item.variants[0] ? item.variants[0] : {};
         var stores = v.stores || [];
