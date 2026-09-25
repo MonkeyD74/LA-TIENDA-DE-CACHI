@@ -29,8 +29,7 @@ export default async function handler(req, res) {
     var categories = {};
     (catData.categories || []).forEach(function(c) { categories[c.id] = c.name; });
 
-    -    var productos = allItems// Stock real: vive en /inventory, no en /items
-+    // Stock real: vive en /inventory, no en /items
+    // Stock real: vive en /inventory, no en /items
     var stockMap = {};
     var invCursor = null;
     var invLoops = 0;
@@ -49,17 +48,16 @@ export default async function handler(req, res) {
         stockMap[l.variant_id + '|' + l.store_id] = l.in_stock;
       });
       invCursor = invData.cursor || null;
-    } while (invCursor && invLoops < 50);-        var stock = store.in_stock !== undefined && store.in_stock !== null ? Math.max(0, Math.floor(store.in_stock)) : 0;
-+        var raw = stockMap[v.variant_id + '|' + store.store_id];
-+        var stock = raw != null ? Math.max(0, Math.floor(raw)) : 0;
+    } while (invCursor && invLoops < 50);
+
+    var productos = allItems
       .map(function(item) {
         var v = item.variants && item.variants[0] ? item.variants[0] : {};
-        -        var stock = store.in_stock !== undefined && store.in_stock !== null ? Math.max(0, Math.floor(store.in_stock)) : 0;
-+        var raw = stockMap[v.variant_id + '|' + store.store_id];
-+        var stock = raw != null ? Math.max(0, Math.floor(raw)) : 0; stores = v.stores || [];
+        var stores = v.stores || [];
         var store = stores[0] || {};
         var precio = store.price !== undefined && store.price !== null ? store.price : (v.default_price || 0);
-        var stock = store.in_stock !== undefined && store.in_stock !== null ? Math.max(0, Math.floor(store.in_stock)) : 0;
+        var raw = stockMap[v.variant_id + '|' + store.store_id];
+        var stock = raw != null ? Math.max(0, Math.floor(raw)) : 0;
         return {
           nombre: item.item_name || '',
           precio: precio,
@@ -81,6 +79,6 @@ export default async function handler(req, res) {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    res.status(500).json({ error: error.message, stack: error.stack });
+    res.status(500).json({ error: error.message });
   }
 }
