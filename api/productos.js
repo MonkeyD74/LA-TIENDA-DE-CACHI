@@ -54,7 +54,9 @@ export default async function handler(req, res) {
 +        var stock = raw != null ? Math.max(0, Math.floor(raw)) : 0;
       .map(function(item) {
         var v = item.variants && item.variants[0] ? item.variants[0] : {};
-        var stores = v.stores || [];
+        -        var stock = store.in_stock !== undefined && store.in_stock !== null ? Math.max(0, Math.floor(store.in_stock)) : 0;
++        var raw = stockMap[v.variant_id + '|' + store.store_id];
++        var stock = raw != null ? Math.max(0, Math.floor(raw)) : 0; stores = v.stores || [];
         var store = stores[0] || {};
         var precio = store.price !== undefined && store.price !== null ? store.price : (v.default_price || 0);
         var stock = store.in_stock !== undefined && store.in_stock !== null ? Math.max(0, Math.floor(store.in_stock)) : 0;
