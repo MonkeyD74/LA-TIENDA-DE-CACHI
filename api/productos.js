@@ -29,7 +29,8 @@ export default async function handler(req, res) {
     var categories = {};
     (catData.categories || []).forEach(function(c) { categories[c.id] = c.name; });
 
-    var productos = allItems// Stock real: vive en /inventory, no en /items
+    -    var productos = allItems// Stock real: vive en /inventory, no en /items
++    // Stock real: vive en /inventory, no en /items
     var stockMap = {};
     var invCursor = null;
     var invLoops = 0;
