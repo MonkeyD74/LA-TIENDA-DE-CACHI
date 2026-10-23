@@ -14,10 +14,17 @@ body{font-family:Arial,sans-serif;background:#f0f4ff;padding-bottom:72px;}
 .search-wrap input{flex:1;padding:8px 12px;border-radius:6px;border:none;font-size:0.85rem;}
 .search-wrap button{padding:8px 14px;background:#FFC107;color:#0D47A1;border:none;border-radius:6px;font-weight:900;cursor:pointer;}
 .banner{background:#CC1A1A;color:white;text-align:center;padding:7px;font-size:0.78rem;font-weight:700;}
-.avatar-section{background:#FFC107;height:115px;position:relative;overflow:hidden;border-bottom:4px solid #E65100;}
+.avatar-section{background:#FFC107;height:149px;position:relative;overflow:hidden;border-bottom:4px solid #E65100;}
 .piso-line{position:absolute;bottom:0;left:0;right:0;height:5px;background:rgba(180,90,0,0.3);}
 #perritoGif{position:absolute;bottom:0;height:108px;width:auto;cursor:pointer;filter:drop-shadow(3px 0 6px rgba(0,0,0,0.15)) drop-shadow(0 0 3px #FFC107) drop-shadow(0 0 3px #FFC107);}
-.avatar-bubble{position:absolute;top:8px;background:white;border-radius:12px 12px 12px 4px;padding:6px 12px;font-size:12px;font-weight:700;color:#0D47A1;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.15);opacity:0;transition:opacity 0.3s;pointer-events:none;}
+.avatar-bubble{position:absolute;top:42px;z-index:3;background:white;border-radius:12px 12px 12px 4px;padding:6px 12px;font-size:12px;font-weight:700;color:#0D47A1;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.15);opacity:0;transition:opacity 0.3s;pointer-events:none;}
+.marquesina{position:absolute;top:0;left:0;right:0;height:34px;background:#1a0b2e;border-bottom:2px solid #E65100;overflow:hidden;z-index:1;display:flex;align-items:center}
+.marquesina-track{display:flex;width:max-content;animation:marq 16s linear infinite}
+.marquesina-track span{flex:none;padding:0 40px;font:900 18px/34px system-ui,-apple-system,Segoe UI,Roboto,sans-serif;letter-spacing:2px;white-space:nowrap;color:#FFE082;text-shadow:0 0 4px #FFC107,0 0 10px #FF6D00,0 0 18px #FF3D00;animation:brillo 1.6s ease-in-out infinite alternate}
+@keyframes marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes brillo{from{color:#FFE082;text-shadow:0 0 3px #FFC107,0 0 8px #FF6D00,0 0 14px #FF3D00}to{color:#fff;text-shadow:0 0 6px #fff,0 0 14px #FFC107,0 0 26px #FF6D00}}
+@media (prefers-reduced-motion:reduce){.marquesina-track,.marquesina-track span{animation:none}}
+
 .main-layout{display:flex;min-height:calc(100vh - 200px);}
 .sidebar{width:220px;background:white;border-right:2px solid #e0e0e0;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;flex-shrink:0;padding-bottom:80px;}
 .sidebar-title{background:#0D47A1;color:white;padding:10px 14px;font-size:0.82rem;font-weight:900;}
@@ -227,7 +234,7 @@ box-shadow:0 4px 15px rgba(0,0,0,.35);
 <div class="search-wrap"><input type="text" id="buscar" placeholder="Buscar productos..." oninput="buscarDebounce()"><button onclick="buscarGlobal()">Buscar</button></div>
 </div>
 <div class="banner">La Tienda de Cachi - Siempre cerca de ti</div>
-<div class="avatar-section" id="avatarSection"><div class="piso-line"></div><img id="perritoGif" src="" alt="Cachi" onclick="perritoClick()"><div class="avatar-bubble" id="avatarBubble"></div></div>
+<div class="avatar-section" id="avatarSection"><div class="marquesina" aria-label="FELICES FIESTAS PATRONALES SAN RAFAEL 2026"><div class="marquesina-track" aria-hidden="true"><span>✨ FELICES FIESTAS PATRONALES SAN RAFAEL 2026 ✨</span><span>✨ FELICES FIESTAS PATRONALES SAN RAFAEL 2026 ✨</span><span>✨ FELICES FIESTAS PATRONALES SAN RAFAEL 2026 ✨</span><span>✨ FELICES FIESTAS PATRONALES SAN RAFAEL 2026 ✨</span></div></div><div class="piso-line"></div><img id="perritoGif" src="" alt="Cachi" onclick="perritoClick()"><div class="avatar-bubble" id="avatarBubble"></div></div>
 <div id="loading" class="loading"><div class="sk-wrap"><div class="sk-bar"></div><div class="sk-grid"><div class="sk-card"></div><div class="sk-card"></div><div class="sk-card"></div><div class="sk-card"></div><div class="sk-card"></div><div class="sk-card"></div></div></div><div style="margin-top:10px;font-size:0.8rem">Cargando inventario...</div></div>
 <div class="main-layout hidden" id="mainLayout">
 <div class="sidebar"><div class="sidebar-title">Categorias</div><ul class="sidebar-list" id="sidebarList"></ul></div>
