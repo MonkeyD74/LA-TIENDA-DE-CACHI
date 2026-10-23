@@ -298,19 +298,19 @@ cargarProductos();
     <button onclick="document.getElementById('rewardOverlay').style.display='none'" style="float:right">✖</button>
     <h2>🎁 Recompensas</h2>
     <p>Acumula 1 centavo por cada $1 peso comprado.</p>
-    <input id="rewardPhone" placeholder="Tu número" style="width:100%;padding:12px;margin:10px 0">
+    <input id="rewardCode" placeholder="Tu código (ej. K7MX-Q2RP)" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="12" style="width:100%;padding:12px;margin:10px 0;text-transform:uppercase;letter-spacing:2px">
+    <p style="font-size:.75rem;color:#666;margin:0 0 10px">Pide tu código en la tienda. Al consultar aceptas nuestro <a href="/privacidad.html" target="_blank">aviso de privacidad</a>.</p>
     <button onclick="consultarReward()" style="width:100%;padding:12px;background:#0D47A1;color:white;border:0;border-radius:10px">Consultar crédito</button>
     <div id="rewardResult" style="margin-top:12px;font-weight:900"></div>
   </div>
 </div>
 <script>
 async function consultarReward(){
-  const phone=document.getElementById('rewardPhone').value.trim();
+  const codigo=document.getElementById('rewardCode').value.trim();
   const box=document.getElementById('rewardResult');
   box.textContent='Consultando...';
-  const r=await fetch('/api/recompensas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone})});
-  const d=await r.json();
-  if(!d.encontrado){box.textContent=d.mensaje||'No encontrado';return;}
+  let d;try{const r=await fetch('/api/recompensas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({codigo})});d=await r.json();}catch(e){box.textContent='Sin conexión, intenta de nuevo';return;}
+  if(!d.encontrado){box.textContent=d.mensaje||d.error||'No encontrado';return;}
   box.innerHTML='🎁 Crédito disponible: $'+Number(d.credito||0).toFixed(2);
 }
 </script>

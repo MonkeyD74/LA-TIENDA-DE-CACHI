@@ -5,70 +5,72 @@ const redis = Redis.fromEnv();
 const ratelimit = new Ratelimit({
   redis,
   limiter: Ratelimit.slidingWindow(5, '10 m'),
-  analytics: true,
+  analytics: false,
   prefix: '@upstash/ratelimit/recompensas',
 });
 
+// Normaliza: mayusculas, sin guiones ni espacios. "k7mx-q2rp" -> "K7MXQ2RP"
+function normalizar(v) {
+  return String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+}
+
 export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Metodo no permitido' });
+  }
   try {
     // Rate limiting por IP
     const forwarded = req.headers['x-forwarded-for'] || '';
     const ip = forwarded.split(',')[0].trim() || 'unknown';
     const { success } = await ratelimit.limit(ip);
     if (!success) {
-      return res.status(429).json({
-        error: 'Demasiados intentos, espera unos minutos'
-      });
+      return res.status(429).json({ error: 'Demasiados intentos, espera unos minutos' });
     }
 
-    // Cambio a POST: leer phone del body
-    const { phone } = req.body || {};
     const token = process.env.LOYVERSE_TOKEN;
     if (!token) return res.status(500).json({ error: 'Token no configurado' });
 
-    const phoneClean = String(phone || '').replace(/[^0-9]/g, '');
-    if (phoneClean.length < 7) return res.status(400).json({ error: 'Numero invalido' });
-
-    const response = await fetch('https://api.loyverse.com/v1.0/customers?limit=250', {
-      headers: { Authorization: 'Bearer ' + token }
-    });
-
-    if (!response.ok) {
-      return res.status(response.status).json({
-        error: 'Error consultando Loyverse',
-        detalle: await response.text()
-      });
+    const codigo = normalizar((req.body || {}).codigo);
+    if (codigo.length < 8) {
+      return res.status(400).json({ error: 'Codigo invalido' });
     }
 
-    const data = await response.json();
-    const phoneLast = phoneClean.slice(-10);
+    // Busca el codigo recorriendo todas las paginas de clientes
+    let found = null;
+    let cursor = null;
+    let loops = 0;
+    do {
+      loops++;
+      const url = 'https://api.loyverse.com/v1.0/customers?limit=250' +
+        (cursor ? '&cursor=' + encodeURIComponent(cursor) : '');
+      const response = await fetch(url, {
+        headers: { Authorization: 'Bearer ' + token }
+      });
+      if (!response.ok) {
+        return res.status(502).json({ error: 'Error consultando Loyverse' });
+      }
+      const data = await response.json();
+      found = (data.customers || []).find(c =>
+        !c.deleted_at && normalizar(c.customer_code) === codigo
+      ) || null;
+      cursor = data.cursor || null;
+    } while (!found && cursor && loops < 40);
 
-    const found = (data.customers || []).find(c => {
-      const cPhone = String(c.phone_number || '').replace(/[^0-9]/g, '');
-      return cPhone.slice(-10) === phoneLast;
-    });
+    res.setHeader('Cache-Control', 'no-store');
 
     if (!found) {
       return res.json({
         encontrado: false,
-        mensaje: 'No encontramos tu numero. Pregunta en la tienda para registrarte.'
+        mensaje: 'Codigo no encontrado. Pregunta en la tienda.'
       });
     }
 
-    const puntos = Number(found.total_points || 0);
-    const gastado = Number(found.total_money_spent || 0);
-    const credito = puntos;
-
+    // Solo se regresa el credito: nada de nombre, telefono ni gasto
     return res.json({
       encontrado: true,
-      nombre: found.name || 'Cliente',
-      telefono: found.phone_number || '',
-      puntos,
-      gastado,
-      credito,
-      mensaje: 'Credito acumulado calculado desde puntos'
+      credito: Number(found.total_points || 0)
     });
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: 'Error interno' });
   }
 }
