@@ -38,6 +38,11 @@ body{font-family:Arial,sans-serif;background:#f0f4ff;padding-bottom:72px;}
 .content{flex:1;padding:14px;max-width:1200px;}
 .menu-titulo{font-size:1rem;font-weight:900;color:#0D47A1;margin-bottom:12px;padding-left:10px;border-left:4px solid #CC1A1A;}
 .menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;}
+.btn-promo{display:none;width:100%;margin:0 0 16px;padding:16px 14px;border:0;border-radius:16px;cursor:pointer;background:linear-gradient(135deg,#D50000,#FF6D00 55%,#FFC107);color:#fff;font:900 1.15rem/1.2 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;letter-spacing:1px;text-align:center;box-shadow:0 6px 18px rgba(213,0,0,.35);animation:promoPulso 1.8s ease-in-out infinite}
+.btn-promo small{display:block;font-size:.78rem;font-weight:700;letter-spacing:0;opacity:.95;margin-top:4px}
+@keyframes promoPulso{0%,100%{transform:scale(1);box-shadow:0 6px 18px rgba(213,0,0,.35)}50%{transform:scale(1.025);box-shadow:0 8px 26px rgba(255,109,0,.6)}}
+@media (prefers-reduced-motion:reduce){.btn-promo{animation:none}}
+
 .menu-card{background:white;border-radius:12px;border-width:3px;border-style:solid;overflow:hidden;cursor:pointer;transition:transform 0.15s;text-align:center;}
 .menu-card:hover{transform:translateY(-3px);}
 .menu-card-icon{font-size:2.5rem;padding:18px 0 10px;}
@@ -239,7 +244,7 @@ box-shadow:0 4px 15px rgba(0,0,0,.35);
 <div class="main-layout hidden" id="mainLayout">
 <div class="sidebar"><div class="sidebar-title">Categorias</div><ul class="sidebar-list" id="sidebarList"></ul></div>
 <div class="content" id="contentArea">
-<div id="menu-principal"><div class="menu-titulo">Que estas buscando hoy?</div><div class="menu-grid" id="menuGrid"></div></div>
+<div id="menu-principal"><button class="btn-promo" id="btnPromo" onclick="abrirPromo()">🔥 PROMOCIONES 🔥<small id="btnPromoSub"></small></button><div class="menu-titulo">Que estas buscando hoy?</div><div class="menu-grid" id="menuGrid"></div></div>
 <div id="cat-content" class="hidden">
 <div class="cat-header"><div><div class="cat-header-txt" id="cat-header-txt"></div><div class="cat-header-sub" id="cat-header-sub"></div></div></div>
 <div class="filtro-stock"><label><input type="checkbox" id="soloDisponibles" onchange="filtrarCat()"> Solo disponibles</label></div>
@@ -270,7 +275,12 @@ function filtrarCat(){if(catActiva)renderGridCat(catActiva);}
 var _ultimoRefresh=0;document.addEventListener("visibilitychange",function(){try{if(document.visibilityState!=="visible")return;if(Date.now()-_ultimoRefresh<60000)return;if(document.getElementById("cartOverlay").style.display==="block")return;_ultimoRefresh=Date.now();fetch("/api/productos").then(function(r){return r.json();}).then(function(data){if(!data||!data.productos)return;var sy=window.scrollY;actualizarDatos(data);try{localStorage.setItem("cachiProds",JSON.stringify({t:Date.now(),data:data}));}catch(e){}var q=document.getElementById("buscar").value.trim();if(q){buscarGlobal();}else if(!document.getElementById("cat-content").classList.contains("hidden")&&catActiva){renderGridCat(catActiva);}else{renderSidebar();renderMenu();}window.scrollTo(0,sy);}).catch(function(){});}catch(e){}});
 function renderSidebar(){var sortedCats=Object.keys(catsData).sort();var h="<li class='sidebar-item active' data-cat='Todos' onclick='clickSidebar(this,\"Todos\")'><div class='sidebar-item-icon' style='background:#0D47A1'>\u{1F3E0}</div><div><div class='sidebar-item-name'>Todos</div><div class='sidebar-item-count'>"+allProducts.length+" productos</div></div></li>";sortedCats.forEach(function(cat){var c=getColor(cat);var disp=catsData[cat].filter(function(p){return p.stock>0;}).length;h+="<li class='sidebar-item' data-cat='"+cat+"' onclick='clickSidebar(this,\""+cat.replace(/"/g,"")+"\")'><div class='sidebar-item-icon' style='background:"+c.bg+"'>"+getEmoji(cat)+"</div><div><div class='sidebar-item-name'>"+cat+"</div><div class='sidebar-item-count'>"+catsData[cat].length+" - "+disp+" disp</div></div></li>";});document.getElementById("sidebarList").innerHTML=h;}
 function clickSidebar(el,cat){document.querySelectorAll(".sidebar-item").forEach(function(i){i.classList.remove("active");});el.classList.add("active");if(cat==="Todos"){volverMenu();}else{openCat(cat);}}
-function renderMenu(){var h="";Object.keys(catsData).sort().forEach(function(cat){var c=getColor(cat);var prods=catsData[cat];var disp=prods.filter(function(p){return p.stock>0;}).length;h+="<div class='menu-card' onclick='openCat(\""+cat.replace(/"/g,"")+"\")' style='border-color:"+c.borde+"'><div class='menu-card-icon' style='background:"+c.bg+"'>"+getEmoji(cat)+"</div><div class='menu-card-name'>"+cat+"</div><div class='menu-card-count'>"+prods.length+" - "+disp+" disponibles</div></div>";});document.getElementById("menuGrid").innerHTML=h;}
+function renderMenu(){var h="";Object.keys(catsData).sort().forEach(function(cat){var c=getColor(cat);var prods=catsData[cat];var disp=prods.filter(function(p){return p.stock>0;}).length;h+="<div class='menu-card' onclick='openCat(\""+cat.replace(/"/g,"")+"\")' style='border-color:"+c.borde+"'><div class='menu-card-icon' style='background:"+c.bg+"'>"+getEmoji(cat)+"</div><div class='menu-card-name'>"+cat+"</div><div class='menu-card-count'>"+prods.length+" - "+disp+" disponibles</div></div>";});document.getElementById("menuGrid").innerHTML=h;actualizarPromo();}
+// Boton de PROMOCIONES: solo aparece si existe la categoria y tiene productos
+function catPromo(){return Object.keys(catsData).find(function(c){return c.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim()==="promociones";});}
+function actualizarPromo(){var b=document.getElementById("btnPromo");if(!b)return;var c=catPromo();var n=c?catsData[c].length:0;if(!n){b.style.display="none";return;}b.style.display="block";document.getElementById("btnPromoSub").textContent=n+(n===1?" producto en oferta":" productos en oferta")+" · Toca para verlos";}
+function abrirPromo(){var c=catPromo();if(c)openCat(c);}
+
 var _lote=0;
 function renderLotes(el,prods){var mi=++_lote;var i=0,TAM=30;el.innerHTML=prods.slice(0,TAM).map(cardHTML).join("");i=TAM;
 function mas(){if(mi!==_lote)return;if(i>=prods.length)return;el.insertAdjacentHTML("beforeend",prods.slice(i,i+TAM).map(cardHTML).join(""));i+=TAM;setTimeout(mas,60);}
@@ -279,8 +289,8 @@ function openCat(cat){
 document.getElementById("menu-principal").classList.add("hidden");
 document.getElementById("busqueda-wrap").classList.add("hidden");
 document.getElementById("cat-content").classList.remove("hidden");
-renderGridCat(cat);
 document.getElementById("soloDisponibles").checked=false;
+renderGridCat(cat);
 catActiva=cat;
 document.getElementById("buscar").value="";
 document.querySelectorAll(".sidebar-item").forEach(function(i){i.classList.toggle("active",i.dataset.cat===cat);});
